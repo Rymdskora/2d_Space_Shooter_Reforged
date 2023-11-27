@@ -8,7 +8,7 @@ import math
 #     'font_color' : 'white',
 #     'hover_images' : images
 # }
-
+# TODO, KILL THIS CLASS (WHEN I FEEL LIKE IT).
 
 class Button:
     def __init__(self, image, position, command, **kwargs):

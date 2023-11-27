@@ -4,6 +4,8 @@ from scripts.button import Button
 from scripts.entities import PlayerEntity
 from scripts.settings import scale_settings as SSDICT
 
+# TODO - There will be circular import jank if I do not resolve how to properly implement the projectile class.
+
 
 class BaseScene:
     def __init__(self, game, screen):
@@ -13,6 +15,7 @@ class BaseScene:
 
     def animateBackground(self):
         pass
+
 
 class TitleScreen(BaseScene):
     def __init__(self, game, screen):
@@ -31,6 +34,7 @@ class TitleScreen(BaseScene):
         self.start.updateButton()
 
 
+# TODO - Create the animated background method, and implement projectiles / projectile handling.
 class GameScreen(BaseScene):
     def __init__(self, game, screen):
         super().__init__(game, screen)
@@ -38,7 +42,8 @@ class GameScreen(BaseScene):
             'player'        : getImageData('player/', SSDICT['ENTITY_SCALE']),
             'background'    : getImageData('background/', None)
         }
-        self.player = PlayerEntity(self.textures['player'], (64, 540), self.sprites)
+        print(self.textures)
+        self.player = PlayerEntity('player', self.textures['player'], (64, 540), self.sprites)
 
     def update(self):
         self.sprites.update()

@@ -10,7 +10,6 @@ class Button:
         self.screen = screen
         self.function = function
         self.scale = SSDICT['UI_SCALE']
-        print(self.textures)
         self.scaleBy = (self.textures[0].get_width() * self.scale, self.textures[0].get_height() * self.scale)
 
         self.image = self.scaleImage(self.textures[0])

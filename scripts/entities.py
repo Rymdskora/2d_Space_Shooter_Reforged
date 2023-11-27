@@ -1,11 +1,12 @@
 import pygame
 import math
-from scripts.settings import scale_settings as SSDICT
+from scripts.settings import game_settings as GSDICT
 
 
 class PhysicsEntity(pygame.sprite.Sprite):
-    def __init__(self, images, position, *groups):
+    def __init__(self, identifier,  images, position, *groups):
         super().__init__(*groups)
+        self.entityType = identifier
         self.textures = images
         self.image = self.textures['idle'][0]
         self.mask = pygame.mask.from_surface(self.image)
@@ -26,12 +27,17 @@ class PhysicsEntity(pygame.sprite.Sprite):
         if self.imageIndex >= len(self.textures['idle']):
             self.imageIndex = 0
 
+    def clampPosition(self):
+        if self.rect.y <= 0:
+            self.rect.midtop = (self.rect.midtop[0], 0)
+        if self.rect.midbottom[1] >= GSDICT['SCREEN_HEIGHT']:
+            self.rect.midbottom = (self.rect.midbottom[0], GSDICT['SCREEN_HEIGHT'])
+
 
 class PlayerEntity(PhysicsEntity):
-    def __init__(self, image, position, *groups):
-        super().__init__(image, position, *groups)
+    def __init__(self, identifier, image, position, *groups):
+        super().__init__(identifier, image, position, *groups)
         self.currentSpeed = 3
-        self.maxSpeed = 3
 
     def getInput(self):
         keys = pygame.key.get_pressed()
@@ -52,4 +58,18 @@ class PlayerEntity(PhysicsEntity):
     def update(self):
         self.getInput()
         self.moveEntity()
+        self.clampPosition()
         self.animateEntity()
+
+
+# TODO - Think about how this should properly work,
+#  we somehow need to pass textures to this class upon instantiation. If we don't do this,
+#  then we'll end up loading the same image EVERY time an object is created.
+class ProjectileEntity(PhysicsEntity):
+    def __init__(self, direction, identifier, image, position, *groups):
+        super().__init__(identifier, image, position, *groups)
+        self.direction = [direction, 0]
+        self.speed = 7
+
+    def update(self):
+        self.moveEntity()

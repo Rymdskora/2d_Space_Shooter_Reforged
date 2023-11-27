@@ -17,7 +17,7 @@ class MainGame:
             'game'  : GameScreen,
             'end'   : EndScreen,
         }
-        self.currentScene = self.sceneList['title'](self, self.screen)
+        self.currentScene = self.sceneList['game'](self, self.screen)
         self.font = pygame.font.Font(loadFromData('Ravish Pixelation.ttf'), 36)
 
     def mainLoop(self):
