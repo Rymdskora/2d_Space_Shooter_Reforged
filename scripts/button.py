@@ -1,6 +1,5 @@
 import pygame
 import math
-from scripts.settings import scale_settings as SSDICT
 from scripts.events import EventHandler
 
 
@@ -9,11 +8,10 @@ class Button:
         self.processAttributes(*attributes)
         self.screen = screen
         self.function = function
-        self.scale = SSDICT['UI_SCALE']
-        self.scaleBy = (self.textures[0].get_width() * self.scale, self.textures[0].get_height() * self.scale)
 
-        self.image = self.scaleImage(self.textures[0])
-        self.rect = self.image.get_rect(center=position)
+        self.image = self.textures[0]
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect = self.mask.get_rect(center=position)
 
         self.renderText = self.font.render(self.text, False, self.font_color)
         self.renderTextRect = self.renderText.get_rect(center=self.rect.center)
@@ -23,11 +21,8 @@ class Button:
         self.imageScrollSpeed = 0.2
         self.alpha = 0
         self.updateAlpha = 5
-        self.hoveredImage = self.scaleImage(self.textures[self.imageIndex])
+        self.hoveredImage = self.textures[self.imageIndex]
         self.hoveredImageRect = self.hoveredImage.get_rect(center=self.rect.center)
-
-    def scaleImage(self, image):
-        return pygame.transform.scale(image, self.scaleBy)
 
     def processAttributes(self, attributes):
         buttonSettings = {
@@ -43,8 +38,8 @@ class Button:
             buttonSettings[argument] = attributes[argument]
         self.__dict__.update(buttonSettings)
 
-    def onMouseHover(self):
-        if self.rect.collidepoint(pygame.mouse.get_pos()):
+    def onMouseHover(self, cursor):
+        if self.mask.overlap(cursor.mask, (cursor.rect[0] - self.rect[0], cursor.rect[1] - self.rect[1])):
             self.onMouseClick()
             self.onHoverAnimate(True)
         else:
@@ -52,10 +47,13 @@ class Button:
 
     def onMouseClick(self):
         if EventHandler.checkEventQueue('clicked') is True:
-            self.function()
+            try:
+                self.function()
+            except TypeError:
+                print(f'Button {self} has no function.')
 
     def onHoverAnimate(self, trueOrFalse):
-        self.hoveredImage = self.scaleImage(self.textures[math.floor(self.imageIndex)])
+        self.hoveredImage = (self.textures[math.floor(self.imageIndex)])
         self.hoveredImage.set_alpha(self.alpha)
         self.imageIndex += self.imageScrollSpeed
         if self.imageIndex >= len(self.textures):
@@ -73,6 +71,6 @@ class Button:
         self.screen.blit(self.hoveredImage, self.hoveredImageRect)
         self.screen.blit(self.renderText, self.renderTextRect)
 
-    def updateButton(self):
-        self.onMouseHover()
+    def updateButton(self, cursor):
+        self.onMouseHover(cursor)
         self.drawOnScreen()
